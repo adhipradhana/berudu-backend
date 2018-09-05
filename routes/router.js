@@ -14,6 +14,9 @@ router.get('/auth/google', passport.authenticate('google', {
   })
 );
 
+//GET route for google callback
+router.get('/auth/google/callback', passport.authenticate('google'))
+
 // POST route for updating data
 router.post('/register', function (req, res, next) {
   // Confirm that user typed same password twice
