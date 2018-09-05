@@ -6,7 +6,7 @@ var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 
 //connect to passport.js
-require('./services/passport')
+require('./services/passport');
 
 //connect to MongoDB
 var dbPath = 'mongodb://localhost:27017/test';
