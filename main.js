@@ -4,9 +4,9 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
-const passport = require('passport')
-const keys = require('./config/keys')
-const GoogleStrategy = require('passport-google-oauth20')
+
+//connect to passport.js
+require('./services/passport')
 
 //connect to MongoDB
 var dbPath = 'mongodb://localhost:27017/test';
@@ -21,17 +21,6 @@ db.on('error', console.error.bind(console, 'DB Connection error:'));
 db.once('open', function () {
 	console.log('Connected to DB!')
 });
-
-//use Google OAuth 2.0 strategy for login
-passport.use(
-  new GoogleStrategy({
-    clientID: keys.googleClientID,
-    clientSecret: keys.googleClientSecret,
-    callbackURL: '/auth/google/callback'
-  }, (accessToken) => {
-    console.log(accessToken);
-  })
-);
 
 //use sessions for tracking logins
 app.use(session({
