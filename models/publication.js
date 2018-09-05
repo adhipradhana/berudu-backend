@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const article = require('article');
 
 var PublicationSchema = new mongoose.schema({
 	publicationID: {
@@ -25,6 +26,16 @@ PublicationSchema.statics.findPublication = function(publicationID) {
 		}
 
 		return publication;
+	});
+}
+
+PublicationSchema.methods.findArticleFromPublication = function() {
+	Article.find({ publicationID: this.publicationID}, function(err, articles) {
+		if (err) {
+			return err;
+		}
+
+		return articles;
 	});
 }
 
