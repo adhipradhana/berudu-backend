@@ -1,13 +1,18 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
-
+const passport = require('passport')
 
 // GET route for reading data
 router.get('/', function (req, res, next) {
   return res.send('Hello Berudu!');
 });
 
+//GET route for login with Google
+router.get('/auth/google', passport.authenticate('google', {
+    scope: ['profile', 'email']
+  })
+);
 
 // POST route for updating data
 router.post('/register', function (req, res, next) {
