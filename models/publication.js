@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const article = require('article');
+const article = require('./article');
 
-var PublicationSchema = new mongoose.schema({
+var PublicationSchema = new mongoose.Schema({
 	publicationID: {
 		type: Number,
 	    unique: true,
