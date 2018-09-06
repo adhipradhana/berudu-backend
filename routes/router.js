@@ -27,7 +27,7 @@ router.get('/auth/google/callback', function(req, res) {
           res.redirect('/');
         }
 
-        req.session.user = user;
+        req.user = user;
         res.redirect('/auth/google/success');
       }) (req, res)
   });       
@@ -35,7 +35,7 @@ router.get('/auth/google/callback', function(req, res) {
 // GET route if google login success
 router.get('/auth/google/success', function (req, res) {
   const payload = {
-    userID: req.session.user.userID
+    userID: req.user.userID
   };
 
   var token = jwt.sign(payload, privateKEY);
@@ -56,7 +56,7 @@ router.use('/api', function (req, res, next) {
             } 
 
             // if everything is good, save to request for use in other routes
-            req.session.userID = decoded.userID; 
+            req.userID = decoded.userID; 
 
             next();
         });
@@ -68,8 +68,19 @@ router.use('/api', function (req, res, next) {
     }
 });
 
-router.get('/api/profile', function (res, req) {
-    console.log(req.session.userID);
+router.get('/api/profile', function (req, res) {
+    User.findOne({userID : req.userID}, function(err, user) {
+        if (err) {
+            return res.json({success : false, message: 'Internal server error'});
+        }
+
+        return res.json({
+            name : user.name,
+            email : user.email,
+            imageURL : user.imageURL,
+            subcription : user.subscription
+        });
+    });
 });
 
 
