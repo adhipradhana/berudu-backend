@@ -3,7 +3,7 @@ var User = require('../models/user');
 const passport = require('passport')
 
 // GET route for reading data
-router.get('/', function (req, res, next) {
+router.get('/', function (req, res) {
   return res.send('Hello Berudu!');
 });
 
@@ -14,7 +14,12 @@ router.get('/auth/google', passport.authenticate('google', {
 );
 
 //GET route for google callback
-router.get('/auth/google/callback', passport.authenticate('google'))
+router.get('/auth/google/callback', function(req, res) {
+      passport.authenticate('google', function(err, user) {
+        req.session.user = user;
+        res.redirect('/profile');
+      }) (req, res)
+  });       
 
 // POST route for updating data
 router.post('/register', function (req, res, next) {
@@ -66,21 +71,8 @@ router.post('/register', function (req, res, next) {
 })
 
 // GET route after registering
-router.get('/profile', function (req, res, next) {
-  User.findById(req.session.userId)
-    .exec(function (error, user) {
-      if (error) {
-        return next(error);
-      } else {
-        if (user === null) {
-          var err = new Error('Not authorized! Go back!');
-          err.status = 400;
-          return next(err);
-        } else {
-          return res.send('<h1>Name: </h1>' + user.username + '<h2>Mail: </h2>' + user.email + '<br><a type="button" href="/logout">Logout</a>')
-        }
-      }
-    });
+router.get('/profile', function (req, res) {
+  res.send(req.session.user);
 });
 
 // GET for logout logout
