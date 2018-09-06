@@ -26,26 +26,50 @@ router.get('/auth/google/callback', function(req, res) {
         if (err) {
           res.redirect('/');
         }
+
         req.session.user = user;
-        res.redirect('/success');
+        res.redirect('/auth/google/success');
       }) (req, res)
   });       
 
-// GET route after registering
-router.get('/success', function (req, res) {
+// GET route if google login success
+router.get('/auth/google/success', function (req, res) {
   const payload = {
     userID: req.session.user.userID
   };
-
-  console.log(router.get('privateKEY'));
 
   var token = jwt.sign(payload, privateKEY);
 
   res.json({token: token});
 });
 
-// GET for logout logout
-router.get('/logout', function (req, res, next) {
+// middleware for authentication
+router.get('/api', function (req, res, next) {
+    // check for token
+    var token = req.headers['x-access-token'];
+
+    // decode token
+    if (token) {
+        jwt.verify(token, privateKEY, function(err, decoded) {
+            if (err) {
+                return res.json({ success: false, message: 'Failed to authenticate token.' });
+            } 
+
+            // if everything is good, save to request for use in other routes
+            req.decoded = decoded;    
+            next();
+        });
+    } else {
+        // if there is no token
+        // return an error
+        return res.json({ success: false, message: 'No token provided.' });
+
+    }
 });
+
+router.get('/api/profile', function (res, req) {
+    console.log(req.decoded);
+});
+
 
 module.exports = router;
