@@ -44,7 +44,7 @@ router.get('/auth/google/success', function (req, res) {
 });
 
 // middleware for authentication
-router.get('/api', function (req, res, next) {
+router.use('/api', function (req, res, next) {
     // check for token
     var token = req.headers['x-access-token'];
 
@@ -56,7 +56,8 @@ router.get('/api', function (req, res, next) {
             } 
 
             // if everything is good, save to request for use in other routes
-            req.decoded = decoded;    
+            req.session.userID = decoded.userID; 
+
             next();
         });
     } else {
@@ -68,7 +69,7 @@ router.get('/api', function (req, res, next) {
 });
 
 router.get('/api/profile', function (res, req) {
-    console.log(req.decoded);
+    console.log(req.session.userID);
 });
 
 
