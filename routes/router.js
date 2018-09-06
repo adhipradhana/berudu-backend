@@ -1,12 +1,13 @@
 const router = require('express').Router();
 var User = require('../models/user');
+var Publication = require('../models/publication')
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
 // set private and public key
-var privateKEY = fs.readFileSync('./config/jwtRS256.key', 'utf8');
-var publicKEY = fs.readFileSync('./config/jwtRS256.key.pub', 'utf8');
+const privateKEY = fs.readFileSync('./config/jwtRS256.key', 'utf8');
+const publicKEY = fs.readFileSync('./config/jwtRS256.key.pub', 'utf8');
 
 
 // GET route for reading data
@@ -73,6 +74,9 @@ router.get('/api/profile', function (req, res) {
         if (err) {
             return res.json({success : false, message: 'Internal server error'});
         }
+        if (!user) {
+          return res.json({});
+        }
 
         return res.json({
             name : user.name,
@@ -83,5 +87,19 @@ router.get('/api/profile', function (req, res) {
     });
 });
 
+router.get('/api/publication/:id', function (req, res) {
+  Publication.findOne({publicationID: req.params.id}, function(err, publication) {
+    if (err) {
+      return res.json({success: false, message: 'Internal error'});
+    }
+    if (!publication) {
+      return res.json({});
+    }
+    return res.json({
+      name: publication.name,
+      url: publication.url
+    });
+  });
+});
 
 module.exports = router;
