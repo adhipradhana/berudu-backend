@@ -28,6 +28,7 @@ router.get('/auth/google/callback', function(req, res) {
         }
 
         req.session.user = user;
+        
         res.redirect('/auth/google/success');
       }) (req, res)
   });       

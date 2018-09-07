@@ -19,26 +19,6 @@ var PublicationSchema = new mongoose.schema({
 	}
 });
 
-PublicationSchema.statics.findPublication = function(publicationID) {
-	Publication.findOne({ publicationID: publicationID }, function(err, publication) {
-		if (err) {
-			return err;
-		}
-
-		return publication;
-	});
-}
-
-PublicationSchema.methods.findArticleFromPublication = function() {
-	Article.find({ publicationID: this.publicationID}, function(err, articles) {
-		if (err) {
-			return err;
-		}
-
-		return articles;
-	});
-}
-
 var Publication = mongoose.model('Publication', PublicationSchema);
 
 module.exports = Publication;
