@@ -35,13 +35,15 @@ router.get('/auth/google/callback', function(req, res) {
 
 // GET route if google login success
 router.get('/auth/google/success', function (req, res) {
-  const payload = {
-    userID: req.session.user.userID
-  };
+    const payload = {
+        userID: req.session.user.userID
+    };
 
-  var token = jwt.sign(payload, privateKEY);
+    var token = jwt.sign(payload, privateKEY);
 
-  res.json({token: token});
+    res.json({
+        token: token
+    });
 });
 
 // middleware for authentication
@@ -53,7 +55,10 @@ router.use('/api', function (req, res, next) {
     if (token) {
         jwt.verify(token, privateKEY, function(err, decoded) {
             if (err) {
-                return res.json({ success: false, message: 'Failed to authenticate token.' });
+                return res.json({
+                    success: false, 
+                    message: 'Failed to authenticate token.' 
+                });
             } 
 
             // if everything is good, save to request for use in other routes
@@ -64,15 +69,20 @@ router.use('/api', function (req, res, next) {
     } else {
         // if there is no token
         // return an error
-        return res.json({ success: false, message: 'No token provided.' });
-
+        return res.json({ 
+            success: false, 
+            message: 'No token provided.' 
+        });
     }
 });
 
 router.get('/api/profile', function (req, res) {
     User.findOne({userID : req.userID}, function(err, user) {
         if (err) {
-            return res.json({success : false, message: 'Internal server error'});
+            return res.json({
+                success : false, 
+                message: 'Internal server error'
+            });
         }
 
         return res.json({
@@ -84,14 +94,20 @@ router.get('/api/profile', function (req, res) {
     });
 });
 
-router.post('/api/addsubs', function (req, res) {
+router.post('/api/subs/add', function (req, res) {
     User.findOne({userID : req.userID}, function(err, user) {
         if (err) {
-            return res.json({success : false, message: 'Internal server error'});
+            return res.json({
+                success : false, 
+                message: 'Internal server error'
+            });
         }
 
         if (!req.body.publicationID) {
-            return res.json({success : false, message: 'Publication ID not found'});
+            return res.json({
+                success : false, 
+                message: 'Publication ID not found'
+            });
         }
 
         // add publication
@@ -100,7 +116,46 @@ router.post('/api/addsubs', function (req, res) {
         // save to db
         user.save(function (err) {
             if (err) {
-                return res.json({success : false, message: 'Unable to save to database'});
+                return res.json({
+                    success : false, 
+                    message: 'Unable to save to database'
+                });
+            }
+
+            return res.json({
+                success : true,
+                message : 'success adding subscription',
+                subscription : user.subscription
+            });
+        });
+    });
+});
+
+router.post('/api/subs/delete', function (req, res) {
+    User.findOne({userID: req.userID}, function(err, user) {
+        if (err) {
+            return res.json({
+                success : false, 
+                message: 'Internal server error'
+            });
+        }
+
+         if (!req.body.publicationID) {
+            return res.json({
+                success : false, 
+                message: 'Publication ID not found'
+            });
+        }
+
+        // add publication
+        user.removePublication(req.body.publicationID);
+
+        // save to db
+        user.save(function (err) {
+            if (err) {
+                return res.json({
+                    success : false, 
+                    message: 'Unable to save'});
             }
 
             return res.json({

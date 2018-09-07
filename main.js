@@ -23,7 +23,7 @@ db.once('open', function () {
 	console.log('Connected to DB!')
 });
 
-//use sessions for tracking logins
+// use sessions for tracking logins
 app.use(session({
   secret: 'work hard',
   resave: true,
@@ -50,7 +50,7 @@ app.use(function (req, res, next) {
 
 // error handler
 // define as the last app.use callback
-app.use(function (err, req, res, next) {
+app.use(function (err, req, res) {
   res.status(err.status || 500);
   res.send(err.message);
 });

@@ -30,11 +30,21 @@ var UserSchema = new mongoose.Schema({
 });
 
 UserSchema.methods.addPublication = function addPublication (publicationID) {
-  this.subscription.push(publicationID);
+  var index = this.subscription.indexOf(publicationID);
+
+  // ID not found in subcription
+  if (index < 0) {
+    this.subscription.push(publicationID);
+  }
 }
 
 UserSchema.methods.removePublication = function removePublication (publicationID) {
-  this.subscription = this.subscription.filter(item => item != publicationID);
+  var index = this.subscription.indexOf(publicationID);
+
+  // ID found in subscription
+  if (index > -1) {
+    this.subscription.splice(index, 1);
+  } 
 }
 
 var User = mongoose.model('User', UserSchema);
