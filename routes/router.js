@@ -28,7 +28,7 @@ router.get('/auth/google/callback', function(req, res) {
         }
 
         req.session.user = user;
-        
+
         res.redirect('/auth/google/success');
       }) (req, res)
   });       
@@ -79,7 +79,35 @@ router.get('/api/profile', function (req, res) {
             name : user.name,
             email : user.email,
             imageURL : user.imageURL,
-            subcription : user.subscription
+            subscription : user.subscription
+        });
+    });
+});
+
+router.post('/api/addsubs', function (req, res) {
+    User.findOne({userID : req.userID}, function(err, user) {
+        if (err) {
+            return res.json({success : false, message: 'Internal server error'});
+        }
+
+        if (!req.body.publicationID) {
+            return res.json({success : false, message: 'Publication ID not found'});
+        }
+
+        // add publication
+        user.addPublication(req.body.publicationID);
+
+        // save to db
+        user.save(function (err) {
+            if (err) {
+                return res.json({success : false, message: 'Unable to save to database'});
+            }
+
+            return res.json({
+                success : true,
+                message : 'success adding subscription',
+                subscription : user.subscription
+            });
         });
     });
 });

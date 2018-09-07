@@ -35,7 +35,7 @@ app.use(session({
 
 // parse incoming requests
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // include routes
 var routes = require('./routes/router');

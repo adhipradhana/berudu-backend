@@ -29,6 +29,14 @@ var UserSchema = new mongoose.Schema({
   }
 });
 
+UserSchema.methods.addPublication = function addPublication (publicationID) {
+  this.subscription.push(publicationID);
+}
+
+UserSchema.methods.removePublication = function removePublication (publicationID) {
+  this.subscription = this.subscription.filter(item => item != publicationID);
+}
+
 var User = mongoose.model('User', UserSchema);
 
 module.exports = User;
