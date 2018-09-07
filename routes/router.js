@@ -28,7 +28,7 @@ router.get('/auth/google/callback', function(req, res) {
           res.redirect('/');
         }
 
-        req.user = user;
+        req.session.user = user;
         res.redirect('/auth/google/success');
       }) (req, res)
   });       
@@ -36,7 +36,7 @@ router.get('/auth/google/callback', function(req, res) {
 // GET route if google login success
 router.get('/auth/google/success', function (req, res) {
   const payload = {
-    userID: req.user.userID
+    userID: req.session.user.userID
   };
 
   var token = jwt.sign(payload, privateKEY);
