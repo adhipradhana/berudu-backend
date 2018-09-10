@@ -1,5 +1,6 @@
 const router = require('express').Router();
 var User = require('../models/user');
+var Publication = require('../models/publication')
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
@@ -110,22 +111,51 @@ router.post('/api/subs/add', function (req, res) {
             });
         }
 
-        // add publication
-        user.addPublication(req.body.publicationID);
-
-        // save to db
-        user.save(function (err) {
+        Publication.findOne({publicationID: req.body.publicationID}, function(err, publication) {
             if (err) {
                 return res.json({
                     success : false, 
-                    message: 'Unable to save to database'
+                    message: 'Internal server error'
                 });
             }
 
-            return res.json({
-                success : true,
-                message : 'success adding subscription',
-                subscription : user.subscription
+            if (!publication) {
+                return res.json({
+                    success : false, 
+                    message: 'Publication not found'
+                });
+            }
+
+            // add user ID to publication
+            publication.addSubscriber(user.userID);
+
+            // save to database
+            publication.save(function (err) {
+                if (err) {
+                    return res.json({
+                        success: false,
+                        message: 'Unable to save to database'
+                    });
+                }
+
+                // add publication
+                user.addPublication(req.body.publicationID);
+
+                // save to db
+                user.save(function (err) {
+                    if (err) {
+                        return res.json({
+                            success : false, 
+                            message: 'Unable to save to database'
+                        });
+                    }
+
+                    return res.json({
+                        success : true,
+                        message : 'success adding subscription',
+                        subscription : user.subscription
+                    });
+                });
             });
         });
     });
@@ -147,24 +177,96 @@ router.post('/api/subs/delete', function (req, res) {
             });
         }
 
-        // add publication
-        user.removePublication(req.body.publicationID);
-
-        // save to db
-        user.save(function (err) {
+        Publication.findOne({publicationID: req.body.publicationID}, function(err, publication) {
             if (err) {
                 return res.json({
                     success : false, 
-                    message: 'Unable to save'});
+                    message: 'Internal server error'
+                });
             }
 
-            return res.json({
-                success : true,
-                message : 'success adding subscription',
-                subscription : user.subscription
+            if (!publication) {
+                return res.json({
+                    success : false, 
+                    message: 'Publication not found'
+                });
+            }
+
+            // add user ID to publication
+            publication.removeSubscriber(user.userID);
+
+            // save to database
+            publication.save(function (err) {
+                if (err) {
+                    return res.json({
+                        success: false,
+                        message: 'Unable to save to database'
+                    });
+                }
+
+                // add publication
+                user.removePublication(req.body.publicationID);
+
+                // save to db
+                user.save(function (err) {
+                    if (err) {
+                        return res.json({
+                            success : false, 
+                            message: 'Unable to save'});
+                    }
+
+                    return res.json({
+                        success : true,
+                        message : 'success adding subscription',
+                        subscription : user.subscription
+                    });
+                });
             });
         });
     });
+});
+
+// FOR TESTING OF COURSE
+router.post('/publication/add', function(req, res) {
+    var publication = new Publication({
+        publicationID : req.body.publicationID,
+        name : req.body.name,
+        url : req.body.url,
+        subscriber : []
+    });
+
+    publication.save(function (err) {
+        if (err) {
+            return res.json({
+                success : false,
+                message : 'Internal server error'
+            });
+        }
+
+        return res.json({
+            publicationID : publication.publicationID,
+            name : publication.name,
+            url : publication.url,
+            subscriber : publication.subscriber
+        });
+    });
+});
+
+// FOR TESTING OF COURSE
+router.post('/publication/delete', function(req, res) {
+    Publication.deleteOne({publicationID: req.body.publicationID}, function (err) {
+        if (err) {
+           return res.json({
+                success : false,
+                message : 'Internal server error'
+            }); 
+        }
+
+        return res.json({
+            success : true,
+            message : 'Deleting publication objectr'
+        });
+    }); 
 });
 
 
