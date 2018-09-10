@@ -226,6 +226,39 @@ router.post('/api/subs/delete', function (req, res) {
     });
 });
 
+router.get('/api/publication/feed', function (req, res) {
+    Publication.findOne({publicationID: req.query.id}, function (err, publication) {
+        console.log(req.params.id);
+
+        if (err) {
+           return res.json({
+                success : false,
+                message : 'Internal server error'
+            }); 
+        }
+
+        if (!publication) {
+            return res.json({
+                success : false,
+                message : 'Publication not found'
+            }); 
+        }
+
+        publication.findPublicationArticle(function (err, articles) {
+            if (err) {
+                return res.json({
+                    success : false,
+                    message : 'Internal server error'
+                });
+            }
+
+            return res.json({
+                articles : articles
+            });
+        }); 
+    });
+});
+
 // FOR TESTING OF COURSE
 router.post('/publication/add', function(req, res) {
     var publication = new Publication({
