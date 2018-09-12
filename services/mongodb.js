@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const keys = require('../config/keys');
-var dbPath = keys.mongoDBKey;
+var dbPath = keys.mongodbURI;
 var dbPath_old = 'mongodb://localhost:27017/test';
 var dbOptions = { useNewUrlParser: true };
 
