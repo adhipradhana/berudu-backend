@@ -100,7 +100,7 @@ router.get('/api/profile', function (req, res) {
     });
 });
 
-router.post('/api/subs/add', function (req, res) {
+router.post('/api/subscription/add', function (req, res) {
     User.findOne({userID : req.userID}, function(err, user) {
         if (err) {
             return res.status(500).json({
@@ -159,7 +159,7 @@ router.post('/api/subs/add', function (req, res) {
     });
 });
 
-router.post('/api/subs/delete', function (req, res) {
+router.post('/api/subscription/delete', function (req, res) {
     User.findOne({userID: req.userID}, function(err, user) {
         if (err) {
             return res.status(500).json({
