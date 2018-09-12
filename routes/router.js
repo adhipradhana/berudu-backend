@@ -23,16 +23,18 @@ router.get('/auth/google', passport.authenticate('google', {
 
 //GET route for google callback
 router.get('/auth/google/callback', function(req, res) {
-      passport.authenticate('google', function(err, user) {
+    passport.authenticate('google', function(err, user) {
         if (err) {
-          res.redirect('/');
+            return res.status(500).json({
+                message : 'Internal server error'
+            });
         }
 
         req.session.user = user;
 
         res.redirect('/auth/google/success');
-      }) (req, res)
-  });       
+    }) (req, res)
+});       
 
 // GET route if google login success
 router.get('/auth/google/success', function (req, res) {
@@ -45,6 +47,11 @@ router.get('/auth/google/success', function (req, res) {
     res.json({
         token: token
     });
+});
+
+// GET route if google login failed
+router.get('/auth/google/fail', function (req, res) {
+
 });
 
 // middleware for authentication
