@@ -1,9 +1,10 @@
 const router = require('express').Router();
-var User = require('../models/user');
-var Publication = require('../models/publication')
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+
+var User = require('../models/user');
+var Publication = require('../models/publication')
 
 // set private and public key
 var privateKEY = fs.readFileSync('./config/jwtRS256.key', 'utf8');
@@ -244,6 +245,25 @@ router.get('/api/publication/feed', function (req, res) {
             });
         }); 
     });
+});
+
+// ================================================== //
+//              ADMIN CRUD OPERATION                  //
+// ================================================== //
+
+// FOR TESTING OF COURSE
+router.post('/user/delete', function (req, res) {
+    User.deleteOne({userID: req.body.userID}, function (err) {
+        if (err) {
+            return res.status(500).json({
+                message : 'Internal server error'
+            });
+        }
+
+        return res.json({
+            message : 'Deleting user object'
+        });
+    }); 
 });
 
 // FOR TESTING OF COURSE
