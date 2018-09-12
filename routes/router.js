@@ -56,8 +56,7 @@ router.use('/api', function (req, res, next) {
     if (token) {
         jwt.verify(token, privateKEY, function(err, decoded) {
             if (err) {
-                return res.json({
-                    success: false, 
+                return res.status(401).json({
                     message: 'Failed to authenticate token.' 
                 });
             } 
@@ -70,9 +69,8 @@ router.use('/api', function (req, res, next) {
     } else {
         // if there is no token
         // return an error
-        return res.json({ 
-            success: false, 
-            message: 'No token provided.' 
+        return res.status(401).json({
+            message : 'Token not found'
         });
     }
 });
@@ -80,8 +78,7 @@ router.use('/api', function (req, res, next) {
 router.get('/api/profile', function (req, res) {
     User.findOne({userID : req.userID}, function(err, user) {
         if (err) {
-            return res.json({
-                success : false, 
+            return res.status(500).json({
                 message: 'Internal server error'
             });
         }
@@ -98,30 +95,26 @@ router.get('/api/profile', function (req, res) {
 router.post('/api/subs/add', function (req, res) {
     User.findOne({userID : req.userID}, function(err, user) {
         if (err) {
-            return res.json({
-                success : false, 
+            return res.status(500).json({
                 message: 'Internal server error'
             });
         }
 
         if (!req.body.publicationID) {
-            return res.json({
-                success : false, 
+            return res.status(404).json({
                 message: 'Publication ID not found'
             });
         }
 
         Publication.findOne({publicationID: req.body.publicationID}, function(err, publication) {
             if (err) {
-                return res.json({
-                    success : false, 
+                return res.status(500).json({
                     message: 'Internal server error'
                 });
             }
 
             if (!publication) {
-                return res.json({
-                    success : false, 
+                return res.status(404).json({
                     message: 'Publication not found'
                 });
             }
@@ -132,9 +125,8 @@ router.post('/api/subs/add', function (req, res) {
             // save to database
             publication.save(function (err) {
                 if (err) {
-                    return res.json({
-                        success: false,
-                        message: 'Unable to save to database'
+                    return res.status(500).json({
+                        message: 'Internal server error'
                     });
                 }
 
@@ -144,15 +136,13 @@ router.post('/api/subs/add', function (req, res) {
                 // save to db
                 user.save(function (err) {
                     if (err) {
-                        return res.json({
-                            success : false, 
-                            message: 'Unable to save to database'
+                        return res.status(500).json({
+                            message: 'Internal server error'
                         });
                     }
 
                     return res.json({
-                        success : true,
-                        message : 'success adding subscription',
+                        message : 'Success adding subscription',
                         subscription : user.subscription
                     });
                 });
@@ -164,30 +154,26 @@ router.post('/api/subs/add', function (req, res) {
 router.post('/api/subs/delete', function (req, res) {
     User.findOne({userID: req.userID}, function(err, user) {
         if (err) {
-            return res.json({
-                success : false, 
+            return res.status(500).json({
                 message: 'Internal server error'
             });
         }
 
          if (!req.body.publicationID) {
-            return res.json({
-                success : false, 
+            return res.status(404).json({
                 message: 'Publication ID not found'
             });
         }
 
         Publication.findOne({publicationID: req.body.publicationID}, function(err, publication) {
             if (err) {
-                return res.json({
-                    success : false, 
+                return res.status(500).json({
                     message: 'Internal server error'
                 });
             }
 
             if (!publication) {
-                return res.json({
-                    success : false, 
+                return res.status(404).json({
                     message: 'Publication not found'
                 });
             }
@@ -198,9 +184,8 @@ router.post('/api/subs/delete', function (req, res) {
             // save to database
             publication.save(function (err) {
                 if (err) {
-                    return res.json({
-                        success: false,
-                        message: 'Unable to save to database'
+                    return res.status(500).json({
+                        message: 'Internal server error'
                     });
                 }
 
@@ -210,14 +195,12 @@ router.post('/api/subs/delete', function (req, res) {
                 // save to db
                 user.save(function (err) {
                     if (err) {
-                        return res.json({
-                            success : false, 
-                            message: 'Unable to save'});
+                        return res.status(500).json({
+                            message: 'Internal server error'});
                     }
 
                     return res.json({
-                        success : true,
-                        message : 'success adding subscription',
+                        message : 'Success deleting subscription',
                         subscription : user.subscription
                     });
                 });
@@ -231,23 +214,20 @@ router.get('/api/publication/feed', function (req, res) {
         console.log(req.params.id);
 
         if (err) {
-           return res.json({
-                success : false,
+           return res.status(500).json({
                 message : 'Internal server error'
             }); 
         }
 
         if (!publication) {
-            return res.json({
-                success : false,
+            return res.status(404).json({
                 message : 'Publication not found'
             }); 
         }
 
         publication.findPublicationArticle(function (err, articles) {
             if (err) {
-                return res.json({
-                    success : false,
+                return res.status(500).json({
                     message : 'Internal server error'
                 });
             }
@@ -270,8 +250,7 @@ router.post('/publication/add', function(req, res) {
 
     publication.save(function (err) {
         if (err) {
-            return res.json({
-                success : false,
+            return res.status(500).json({
                 message : 'Internal server error'
             });
         }
@@ -289,15 +268,13 @@ router.post('/publication/add', function(req, res) {
 router.post('/publication/delete', function(req, res) {
     Publication.deleteOne({publicationID: req.body.publicationID}, function (err) {
         if (err) {
-           return res.json({
-                success : false,
+           return res.status(500).json({
                 message : 'Internal server error'
             }); 
         }
 
         return res.json({
-            success : true,
-            message : 'Deleting publication objectr'
+            message : 'Deleting publication object'
         });
     }); 
 });
