@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const mongoosePaginate = require('mongoose-paginate')
 
 var ArticleSchema = new mongoose.Schema({
 	publicationID: {
@@ -25,6 +26,8 @@ var ArticleSchema = new mongoose.Schema({
 		required: true
 	}
 });
+
+ArticleSchema.plugin(mongoosePaginate);
 
 var Article = mongoose.model('Article', ArticleSchema);
 

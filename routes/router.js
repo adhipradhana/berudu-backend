@@ -233,7 +233,7 @@ router.get('/api/publication/feed', function (req, res) {
             }); 
         }
 
-        publication.findPublicationArticle(function (err, articles) {
+        publication.findPublicationArticle(req.query.page, function (err, articles) {
             if (err) {
                 return res.status(500).json({
                     message : 'Internal server error'

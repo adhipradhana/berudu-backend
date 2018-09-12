@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate')
 var Article = require('./article')
 
 var PublicationSchema =  new mongoose.Schema({
@@ -41,13 +42,13 @@ PublicationSchema.methods.removeSubscriber = function removeSubscriber (userID) 
   } 
 }
 
-PublicationSchema.methods.findPublicationArticle = function findPublicationArticle (callback) {
-	Article.find({publicationID: this.publicationID}, function (err, articles) {
+PublicationSchema.methods.findPublicationArticle = function findPublicationArticle (page, callback) {
+	Article.paginate(Article.find({publicationID: this.publicationID}), {page: page, limit: 10}, function(err, articles) {
 		if (err) {
 			return callback(err);
 		}
 
-		return callback(null, articles);
+		return callback(null, articles.docs);
 	});
 }
 
