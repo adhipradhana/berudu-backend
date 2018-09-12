@@ -20,6 +20,10 @@ var ArticleSchema = new mongoose.Schema({
 		type: Date,
 		required: true
 	},
+	timestamp: {
+		type: Number,
+		required: true
+	},
 	url: {
 		type: String,
 		trim: true,
