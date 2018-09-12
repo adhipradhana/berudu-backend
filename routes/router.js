@@ -219,8 +219,6 @@ router.post('/api/subs/delete', function (req, res) {
 
 router.get('/api/publication/feed', function (req, res) {
     Publication.findOne({publicationID: req.query.id}, function (err, publication) {
-        console.log(req.params.id);
-
         if (err) {
            return res.status(500).json({
                 message : 'Internal server error'
@@ -244,6 +242,34 @@ router.get('/api/publication/feed', function (req, res) {
                 articles : articles
             });
         }); 
+    });
+});
+
+router.get('/api/subscription/feed', function (req, res) {
+    User.findOne({userID: req.userID}, function (err, user) {
+        if (err) {
+            return res.status(500).json({
+                message : 'Internal server error'
+            });
+        }
+
+        if (!user) {
+            return res.status(404).json({
+                message : 'User not found'
+            });
+        }
+
+        user.findSubscribedArticle(req.query.page, function (err, articles) {
+            if (err) {
+                return res.status(500).json({
+                    message : 'Internal server error'
+                }); 
+            }
+
+            return res.json({
+                articles : articles
+            });
+        });
     });
 });
 

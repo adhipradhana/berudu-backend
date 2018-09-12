@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+var Article = require('./article')
 
 var UserSchema = new mongoose.Schema({
   userID: {
@@ -45,6 +46,16 @@ UserSchema.methods.removePublication = function removePublication (publicationID
   if (index > -1) {
     this.subscription.splice(index, 1);
   } 
+}
+
+UserSchema.methods.findSubscribedArticle = function findSubscribedArticle (page, callback) {
+    Article.paginate(Article.find({publicationID: {$in : this.subscription}}), {page: page, limit: 10}, function (err, articles) {
+        if (err) {
+            return callback(err);
+        }
+
+        return callback(null, articles.docs);
+    });
 }
 
 var User = mongoose.model('User', UserSchema);
