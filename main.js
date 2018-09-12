@@ -1,27 +1,15 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 
 
-//connect to passport.js
+//connect to Passport
 require('./services/passport');
 
 //connect to MongoDB
-var dbPath = 'mongodb://localhost:27017/test';
-var dbOptions = { useNewUrlParser: true };
-
-mongoose.connect(dbPath, dbOptions);
-
-var db = mongoose.connection;
-
-//handle mongo error
-db.on('error', console.error.bind(console, 'DB Connection error:'));
-db.once('open', function () {
-	console.log('Connected to DB!')
-});
+const db = require('./services/mongodb');
 
 // use sessions for tracking logins
 app.use(session({
