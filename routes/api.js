@@ -1,5 +1,4 @@
-const router = require('express').Router();
-const passport = require('passport');
+const api = require('express').Router();
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
@@ -10,53 +9,8 @@ var Publication = require('../models/publication')
 const privateKEY = fs.readFileSync('./config/jwtRS256.key', 'utf8');
 const publicKEY = fs.readFileSync('./config/jwtRS256.key.pub', 'utf8');
 
-
-// GET route for reading data
-router.get('/', function (req, res) {
-  return res.send('Hello Berudu!');
-});
-
-//GET route for login with Google
-router.get('/auth/google', passport.authenticate('google', {
-    scope: ['profile', 'email']
-  })
-);
-
-//GET route for google callback
-router.get('/auth/google/callback', function(req, res) {
-    passport.authenticate('google', function(err, user) {
-        if (err) {
-            return res.status(500).json({
-                message : 'Internal server error'
-            });
-        }
-
-        req.session.user = user;
-
-        res.redirect('/auth/google/success');
-    }) (req, res)
-});
-
-// GET route if google login success
-router.get('/auth/google/success', function (req, res) {
-    const payload = {
-        userID: req.session.user.userID
-    };
-
-    var token = jwt.sign(payload, privateKEY);
-
-    res.json({
-        token: token
-    });
-});
-
-// GET route if google login failed
-router.get('/auth/google/fail', function (req, res) {
-
-});
-
 // middleware for authentication
-router.use('/api', function (req, res, next) {
+api.use('/', function (req, res, next) {
     // check for token
     var token = req.headers['x-access-token'];
 
@@ -83,7 +37,7 @@ router.use('/api', function (req, res, next) {
     }
 });
 
-router.get('/api/profile', function (req, res) {
+api.get('/profile', function (req, res) {
     User.findOne({userID : req.userID}, function(err, user) {
         if (err) {
             return res.status(500).json({
@@ -103,7 +57,7 @@ router.get('/api/profile', function (req, res) {
     });
 });
 
-router.post('/api/subscription/add', function (req, res) {
+api.post('/subscription/add', function (req, res) {
     User.findOne({userID : req.userID}, function(err, user) {
         if (err) {
             return res.status(500).json({
@@ -162,7 +116,7 @@ router.post('/api/subscription/add', function (req, res) {
     });
 });
 
-router.post('/api/subscription/delete', function (req, res) {
+api.post('/subscription/delete', function (req, res) {
     User.findOne({userID: req.userID}, function(err, user) {
         if (err) {
             return res.status(500).json({
@@ -220,21 +174,7 @@ router.post('/api/subscription/delete', function (req, res) {
     });
 });
 
-router.get('/api/publication/list', function (req, res) {
-    Publication.getAll(req.query.page, function (err, publications) {
-        if (err) {
-            return res.status(500).json({
-                message : 'Internal server error'
-            });
-        }
-
-        return res.json({
-            publications : publications
-        });
-    });
-});
-
-router.get('/api/publication/feed', function (req, res) {
+api.get('/publication/feed', function (req, res) {
     Publication.findOne({publicationID: req.query.id}, function (err, publication) {
         if (err) {
            return res.status(500).json({
@@ -262,7 +202,7 @@ router.get('/api/publication/feed', function (req, res) {
     });
 });
 
-router.get('/api/subscription/feed', function (req, res) {
+api.get('/subscription/feed', function (req, res) {
     User.findOne({userID: req.userID}, function (err, user) {
         if (err) {
             return res.status(500).json({
@@ -289,65 +229,3 @@ router.get('/api/subscription/feed', function (req, res) {
         });
     });
 });
-
-// ================================================== //
-//              ADMIN CRUD OPERATION                  //
-// ================================================== //
-
-// FOR TESTING OF COURSE
-router.post('/user/delete', function (req, res) {
-    User.deleteOne({userID: req.body.userID}, function (err) {
-        if (err) {
-            return res.status(500).json({
-                message : 'Internal server error'
-            });
-        }
-
-        return res.json({
-            message : 'Deleting user object'
-        });
-    });
-});
-
-// FOR TESTING OF COURSE
-router.post('/publication/add', function(req, res) {
-    var publication = new Publication({
-        publicationID : req.body.publicationID,
-        name : req.body.name,
-        url : req.body.url,
-        subscriber : []
-    });
-
-    publication.save(function (err) {
-        if (err) {
-            return res.status(500).json({
-                message : 'Internal server error'
-            });
-        }
-
-        return res.json({
-            publicationID : publication.publicationID,
-            name : publication.name,
-            url : publication.url,
-            subscriber : publication.subscriber
-        });
-    });
-});
-
-// FOR TESTING OF COURSE
-router.post('/publication/delete', function(req, res) {
-    Publication.deleteOne({publicationID: req.body.publicationID}, function (err) {
-        if (err) {
-           return res.status(500).json({
-                message : 'Internal server error'
-            });
-        }
-
-        return res.json({
-            message : 'Deleting publication object'
-        });
-    });
-});
-
-
-module.exports = router;
