@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-const mongoosePaginate = require('mongoose-paginate')
+const mongoose = require('mongoose')
 var Article = require('./article')
 
 var PublicationSchema =  new mongoose.Schema({
