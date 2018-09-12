@@ -12,32 +12,32 @@ passport.use(
   }, 
   function (accessToken, refreshToken, profile, done) {
   	User.findOne({ userID : profile.id }, function(err, user) {
-  			if (err) {
-  				return done(err);
-  			}
+		if (err) {
+			return done(err);
+		}
 
-  			if (user) {
-  				// user found
-  				return done(null, user);
-  			}
+		if (user) {
+			// user found
+			return done(null, user);
+		}
 
-  			else {
-  				var newUser = new User({
-  					userID : profile.id,
-  					name : profile.displayName,
-  					email : profile.emails[0].value,
-  					imageURL : profile.photos[0].value,
-  					subscription : []
-  				});
+		else {
+			var newUser = new User({
+				userID : profile.id,
+				name : profile.displayName,
+				email : profile.emails[0].value,
+				imageURL : profile.photos[0].value,
+				subscription : []
+			});
 
-  				newUser.save(function (err) {
-  					if (err) {
-  						return done(err);
-  					}
+			newUser.save(function (err) {
+				if (err) {
+					return done(err);
+				}
 
-  					return done(null, newUser);
-  				});
-  			}
-  		});
+				return done(null, newUser);
+			});
+		}
+  	});
   })
 );
