@@ -50,10 +50,6 @@ router.get('/auth/google/success', function (req, res) {
     });
 });
 
-// GET route if google login failed
-router.get('/auth/google/fail', function (req, res) {
-
-});
 
 // middleware for authentication
 router.use('/api', function (req, res, next) {
