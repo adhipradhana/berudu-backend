@@ -50,14 +50,6 @@ PublicationSchema.methods.findPublicationArticle = function findPublicationArtic
 
 		return callback(null, articles.docs);
 	});
-
-	// Article.find({publicationID: this.publicationID}, function (err, articles) {
-	// 	if (err) {
-	// 		return callback(err);
-	// 	}
-
-	// 	return callback(null, articles);
-	// });
 }
 
 var Publication = mongoose.model('Publication', PublicationSchema);
