@@ -40,7 +40,8 @@ router.get('/auth/google/callback', function(req, res) {
 // GET route if google login success
 router.get('/auth/google/success', function (req, res) {
     const payload = {
-        userID: req.session.user.userID
+        userID: req.session.user.userID,
+        admin: false
     };
 
     var token = jwt.sign(payload, privateKEY);
@@ -63,6 +64,39 @@ router.use('/api', function (req, res, next) {
                 return res.status(401).json({
                     message: 'Failed to authenticate token.'
                 });
+            }
+
+            // if everything is good, save to request for use in other routes
+            req.userID = decoded.userID;
+
+            next();
+        });
+    } else {
+        // if there is no token
+        // return an error
+        return res.status(401).json({
+            message : 'Token not found'
+        });
+    }
+});
+
+router.use('/admin', function (req, res, next) {
+    // check for token
+    var token = req.headers['x-access-token'];
+
+    // decode token
+    if (token) {
+        jwt.verify(token, privateKEY, function(err, decoded) {
+            if (err) {
+                return res.status(401).json({
+                    message: 'Failed to authenticate token.'
+                });
+            }
+
+            if (decoded.admin === false) {
+              return res.status(403).json({
+                  message: 'Forbidden.'
+              });
             }
 
             // if everything is good, save to request for use in other routes
@@ -291,7 +325,7 @@ router.get('/api/subscription/feed', function (req, res) {
 // ================================================== //
 
 // FOR TESTING OF COURSE
-router.post('/user/delete', function (req, res) {
+router.post('/admin/user/delete', function (req, res) {
     User.deleteOne({userID: req.body.userID}, function (err) {
         if (err) {
             return res.status(500).json({
@@ -306,7 +340,7 @@ router.post('/user/delete', function (req, res) {
 });
 
 // FOR TESTING OF COURSE
-router.post('/publication/add', function(req, res) {
+router.post('/admin/publication/add', function(req, res) {
     var publication = new Publication({
         publicationID : req.body.publicationID,
         name : req.body.name,
@@ -331,7 +365,7 @@ router.post('/publication/add', function(req, res) {
 });
 
 // FOR TESTING OF COURSE
-router.post('/publication/delete', function(req, res) {
+router.post('/admin/publication/delete', function(req, res) {
     Publication.deleteOne({publicationID: req.body.publicationID}, function (err) {
         if (err) {
            return res.status(500).json({
