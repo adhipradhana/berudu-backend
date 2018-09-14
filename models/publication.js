@@ -22,7 +22,7 @@ var PublicationSchema =  new mongoose.Schema({
 		type: [String],
 		required: true
 	}
-});
+}, {collection: 'publication'});
 
 PublicationSchema.plugin(mongoosePaginate);
 

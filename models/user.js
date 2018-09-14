@@ -28,7 +28,7 @@ var UserSchema = new mongoose.Schema({
     type: [Number],
     required: true
   }
-});
+}, {collection: 'user'});
 
 UserSchema.methods.addPublication = function addPublication (publicationID) {
   var index = this.subscription.indexOf(publicationID);

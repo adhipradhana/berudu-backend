@@ -29,7 +29,7 @@ var ArticleSchema = new mongoose.Schema({
 		trim: true,
 		required: true
 	}
-});
+}, {collection: 'article'});
 
 ArticleSchema.plugin(mongoosePaginate);
 
